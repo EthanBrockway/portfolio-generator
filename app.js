@@ -1,13 +1,7 @@
 const inquirer = require("inquirer");
-// const fs = require("fs");
-// const generatePage = require("./src/page-template.js");
+const fs = require("fs");
+const generatePage = require("./src/page-template.js");
 
-// const pageHTML = generatePage(profileName, github);
-
-// fs.writeFile("index.html", pageHTML, (err) => {
-//   if (err) throw new Error(err);
-//   console.log("Portfolio complete! Check out index.html to see the output!");
-// });
 const promptUser = () => {
   return inquirer.prompt([
     {
@@ -27,8 +21,8 @@ const promptUser = () => {
       type: "input",
       name: "github",
       message: "Enter your github username",
-      validate: (nameInput) => {
-        if (nameInput) {
+      validate: (githubInput) => {
+        if (githubInput) {
           return true;
         } else {
           console.log("Please enter your github username");
@@ -58,6 +52,12 @@ const promptUser = () => {
 };
 
 const promptProject = (portfolioData) => {
+  console.log(`
+=================
+Add a New Project
+=================
+`);
+  // If there's no 'projects' array property, create one
   if (!portfolioData.projects) {
     portfolioData.projects = [];
   }
@@ -81,8 +81,8 @@ const promptProject = (portfolioData) => {
         type: "input",
         name: "description",
         message: "Provide a description for the project",
-        validate: (nameInput) => {
-          if (nameInput) {
+        validate: (descriptionInput) => {
+          if (descriptionInput) {
             return true;
           } else {
             console.log("Please enter a description for the project");
@@ -108,8 +108,8 @@ const promptProject = (portfolioData) => {
         type: "link",
         name: "link",
         message: "Enter the GitHub link to your project. (Required)",
-        validate: (nameInput) => {
-          if (nameInput) {
+        validate: (linkInput) => {
+          if (linkInput) {
             return true;
           } else {
             console.log("Please enter the link to your github project");
@@ -127,6 +127,7 @@ const promptProject = (portfolioData) => {
         type: "confirm",
         name: "confirmAddProject",
         message: "Would you like to enter another project?",
+        default: false,
       },
     ])
     .then((projectData) => {
@@ -141,5 +142,12 @@ const promptProject = (portfolioData) => {
 promptUser()
   .then(promptProject)
   .then((portfolioData) => {
-    console.log(portfolioData);
+    const pageHTML = generatePage(portfolioData);
+
+    fs.writeFile("./index.html", pageHTML, (err) => {
+      if (err) throw new Error(err);
+      console.log(
+        "Portfolio complete! Check out index.html to see the output!"
+      );
+    });
   });
